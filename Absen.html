@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Absensi Siswa</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, #7c3aed 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #06b6d4 0%, transparent 35%),
+        linear-gradient(135deg, #111827, #1e1b4b);
+    color: white;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header .icon {
+    width: 75px;
+    height: 75px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 22px;
+    font-size: 38px;
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    box-shadow: 0 15px 35px rgba(0,0,0,.3);
+    animation: floating 3s ease-in-out infinite;
+}
+
+@keyframes floating {
+    0%,100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-7px);
+    }
+}
+
+.header h1 {
+    margin-top: 15px;
+    font-size: 30px;
+}
+
+.header p {
+    color: #cbd5e1;
+    margin-top: 7px;
+}
+
+/* JAM */
+
+.clock-box {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 18px;
+    text-align: center;
+    margin-bottom: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+
+.clock {
+    font-size: 34px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #67e8f9;
+}
+
+.date {
+    margin-top: 7px;
+    color: #e2e8f0;
+    font-size: 15px;
+}
+
+.timezone {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 12px;
+    border-radius: 30px;
+    background: rgba(34,211,238,.15);
+    color: #67e8f9;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* CARD */
+
+.card {
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.15);
+    backdrop-filter: blur(15px);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.25);
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 21px;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #e2e8f0;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 15px;
+    border-radius: 14px;
+    border: 2px solid transparent;
+    outline: none;
+    background: rgba(255,255,255,.12);
+    color: white;
+    font-size: 16px;
+    transition: .25s;
+}
+
+input[type="text"]::placeholder {
+    color: #94a3b8;
+}
+
+input[type="text"]:focus {
+    border-color: #22d3ee;
+    background: rgba(255,255,255,.16);
+}
+
+/* CHECKBOX */
+
+.attendance-option {
+    margin-top: 18px;
+}
+
+.attendance-label {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 17px;
+    border-radius: 17px;
+    cursor: pointer;
+    background: rgba(34,197,94,.12);
+    border: 2px solid rgba(34,197,94,.25);
+    transition: .25s;
+}
+
+.attendance-label:hover {
+    transform: translateY(-2px);
+    background: rgba(34,197,94,.2);
+}
+
+.attendance-label input {
+    display: none;
+}
+
+.checkmark {
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+    border: 2px solid #4ade80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.attendance-label input:checked + .checkmark {
+    background: #22c55e;
+    color: white;
+    box-shadow: 0 0 18px rgba(34,197,94,.5);
+}
+
+.attendance-label input:checked + .checkmark::after {
+    content: "✓";
+}
+
+.attendance-text strong {
+    display: block;
+    font-size: 17px;
+}
+
+.attendance-text small {
+    color: #a7f3d0;
+}
+
+/* BUTTON */
+
+.submit-btn {
+    width: 100%;
+    margin-top: 20px;
+    border: none;
+    padding: 16px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+}
+
+.submit-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* STATISTIK */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    padding: 18px 10px;
+    border-radius: 18px;
+    text-align: center;
+    background: rgba(255,255,255,.09);
+    border: 1px solid rgba(255,255,255,.1);
+}
+
+.stat .number {
+    font-size: 26px;
+    font-weight: bold;
+    color: #67e8f9;
+}
+
+.stat .label {
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-top: 5px;
+}
+
+/* TABLE */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+th {
+    text-align: left;
+    padding: 13px;
+    color: #67e8f9;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+    font-size: 13px;
+}
+
+td {
+    padding: 14px 13px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    color: #e2e8f0;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 11px;
+    border-radius: 30px;
+    background: rgba(34,197,94,.15);
+    color: #4ade80;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+    padding: 35px 10px;
+    color: #94a3b8;
+}
+
+/* DELETE */
+
+.delete-btn {
+    margin-top: 18px;
+    width: 100%;
+    padding: 13px;
+    border-radius: 13px;
+    border: 1px solid rgba(248,113,113,.3);
+    background: rgba(248,113,113,.1);
+    color: #fca5a5;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* NOTIFICATION */
+
+.notification {
+    position: fixed;
+    left: 50%;
+    top: 20px;
+    transform: translate(-50%, -150px);
+    background: #22c55e;
+    color: white;
+    padding: 14px 20px;
+    border-radius: 13px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.3);
+    font-weight: bold;
+    z-index: 9999;
+    transition: .4s;
+    text-align: center;
+    max-width: 90%;
+}
+
+.notification.show {
+    transform: translate(-50%, 0);
+}
+
+.notification.error {
+    background: #ef4444;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 12px;
+    }
+
+    .header h1 {
+        font-size: 25px;
+    }
+
+    .clock {
+        font-size: 28px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .stats {
+        gap: 8px;
+    }
+
+    .stat {
+        padding: 14px 5px;
+    }
+
+    .stat .number {
+        font-size: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="icon">
+            📚
+        </div>
+
+        <h1>Absensi Siswa</h1>
+
+        <p>
+            Silakan isi nama dan centang kehadiran kamu
+        </p>
+
+    </div>
+
+
+    <!-- JAM -->
+
+    <div class="clock-box">
+
+        <div class="clock" id="clock">
+            00:00:00
+        </div>
+
+        <div class="date" id="date">
+            Memuat tanggal...
+        </div>
+
+        <div class="timezone">
+            🇮🇩 WAKTU INDONESIA BARAT (WIB)
+        </div>
+
+    </div>
+
+
+    <!-- FORM -->
+
+    <div class="card">
+
+        <div class="card-title">
+            📝 Isi Kehadiran
+        </div>
+
+        <form id="attendanceForm">
+
+            <label for="studentName">
+                Nama Lengkap
+            </label>
+
+            <input
+                type="text"
+                id="studentName"
+                placeholder="Contoh: Budi Santoso"
+                autocomplete="name"
+                required
+            >
+
+            <div class="attendance-option">
+
+                <label class="attendance-label">
+
+                    <input
+                        type="checkbox"
+                        id="hadir"
+                    >
+
+                    <span class="checkmark"></span>
+
+                    <span class="attendance-text">
+
+                        <strong>
+                            Saya Hadir
+                        </strong>
+
+                        <small>
+                            Centang untuk mengonfirmasi kehadiran
+                        </small>
+
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-btn"
+                id="submitBtn">
+
+                📤 Kirim Kehadiran
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- STATISTIK -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div
+                class="number"
+                id="totalHadir">
+                0
+            </div>
+
+            <div class="label">
+                Sudah Hadir
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div
+                class="number"
+                id="totalHari">
+                0
+            </div>
+
+            <div class="label">
+                Hari Ini
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div
+                class="number"
+                id="jamSekarang">
+                --
+            </div>
+
+            <div class="label">
+                WIB
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DAFTAR ABSENSI -->
+
+    <div class="card">
+
+        <div class="card-title">
+            📋 Daftar Kehadiran Hari Ini
+        </div>
+
+        <div
+            class="table-wrapper"
+            id="tableWrapper">
+        </div>
+
+        <button
+            class="delete-btn"
+            id="deleteAll">
+
+            🗑️ Hapus Semua Data Absensi
+
+        </button>
+
+    </div>
+
+
+    <footer>
+        Sistem Absensi Siswa • Waktu mengikuti WIB 🇮🇩
+    </footer>
+
+</div>
+
+
+<div
+    class="notification"
+    id="notification">
+</div>
+
+
+<script>
+
+/* =====================================================
+   KONFIGURASI EMAILJS
+===================================================== */
+
+const EMAILJS_PUBLIC_KEY =
+    "UluYZwgky_eJj1Zpi";
+
+const EMAILJS_TEMPLATE_ID =
+    "template_a01o0xf";
+
+const EMAILJS_SERVICE_ID =
+    "service_amjrwdo";
+
+
+/* =====================================================
+   INISIALISASI EMAILJS
+===================================================== */
+
+emailjs.init({
+    publicKey: EMAILJS_PUBLIC_KEY
+});
+
+
+/* =====================================================
+   STORAGE
+===================================================== */
+
+const STORAGE_KEY =
+    "data_absensi_siswa";
+
+
+/* =====================================================
+   WIB
+===================================================== */
+
+function getWIB() {
+
+    const now = new Date();
+
+    const parts =
+        new Intl.DateTimeFormat(
+            "en-CA",
+            {
+                timeZone: "Asia/Jakarta",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hourCycle: "h23"
+            }
+        ).formatToParts(now);
+
+    const data = {};
+
+    parts.forEach(part => {
+
+        if (part.type !== "literal") {
+            data[part.type] = part.value;
+        }
+
+    });
+
+    return data;
+}
+
+
+/* =====================================================
+   TANGGAL WIB
+===================================================== */
+
+function getTanggalWIB() {
+
+    const waktu = getWIB();
+
+    const tanggal = new Date(
+        `${waktu.year}-${waktu.month}-${waktu.day}T12:00:00+07:00`
+    );
+
+    return tanggal.toLocaleDateString(
+        "id-ID",
+        {
+            timeZone: "Asia/Jakarta",
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =====================================================
+   JAM
+===================================================== */
+
+function updateClock() {
+
+    const waktu = getWIB();
+
+    document.getElementById("clock")
+        .textContent =
+        `${waktu.hour}:${waktu.minute}:${waktu.second}`;
+
+    document.getElementById("date")
+        .textContent =
+        getTanggalWIB();
+
+    document.getElementById("jamSekarang")
+        .textContent =
+        `${waktu.hour}:${waktu.minute}`;
+
+}
+
+setInterval(updateClock, 1000);
+
+updateClock();
+
+
+/* =====================================================
+   DATA
+===================================================== */
+
+function getData() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(STORAGE_KEY)
+        ) || [];
+
+    } catch {
+
+        return [];
+
+    }
+
+}
+
+
+function saveData(data) {
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(data)
+    );
+
+}
+
+
+/* =====================================================
+   DATE KEY
+===================================================== */
+
+function getDateKey() {
+
+    const waktu = getWIB();
+
+    return `${waktu.year}-${waktu.month}-${waktu.day}`;
+
+}
+
+
+/* =====================================================
+   WAKTU SEKARANG
+===================================================== */
+
+function getTimeNow() {
+
+    const waktu = getWIB();
+
+    return `${waktu.hour}:${waktu.minute}:${waktu.second} WIB`;
+
+}
+
+
+/* =====================================================
+   NOTIFICATION
+===================================================== */
+
+let notificationTimer;
+
+function showNotification(
+    message,
+    error = false
+) {
+
+    const notification =
+        document.getElementById(
+            "notification"
+        );
+
+    notification.textContent =
+        message;
+
+    notification.classList.toggle(
+        "error",
+        error
+    );
+
+    notification.classList.add("show");
+
+    clearTimeout(notificationTimer);
+
+    notificationTimer =
+        setTimeout(() => {
+
+            notification.classList.remove(
+                "show"
+            );
+
+        }, 3000);
+
+}
+
+
+/* =====================================================
+   FORM ABSENSI
+===================================================== */
+
+document
+.getElementById("attendanceForm")
+.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const nameInput =
+            document.getElementById(
+                "studentName"
+            );
+
+        const hadir =
+            document.getElementById(
+                "hadir"
+            );
+
+        const submitBtn =
+            document.getElementById(
+                "submitBtn"
+            );
+
+        const name =
+            nameInput.value.trim();
+
+
+        /* VALIDASI NAMA */
+
+        if (name.length < 2) {
+
+            showNotification(
+                "❌ Nama harus diisi dengan benar!",
+                true
+            );
+
+            nameInput.focus();
+
+            return;
+
+        }
+
+
+        /* VALIDASI CHECKBOX */
+
+        if (!hadir.checked) {
+
+            showNotification(
+                "❌ Silakan centang Saya Hadir!",
+                true
+            );
+
+            return;
+
+        }
+
+
+        let data = getData();
+
+        const today =
+            getDateKey();
+
+
+        /* CEK DUPLIKAT */
+
+        const alreadyExists =
+            data.some(item =>
+                item.tanggalKey === today &&
+                item.nama.toLowerCase() ===
+                name.toLowerCase()
+            );
+
+
+        if (alreadyExists) {
+
+            showNotification(
+                "⚠️ Nama tersebut sudah absen hari ini!",
+                true
+            );
+
+            return;
+
+        }
+
+
+        const waktu =
+            getWIB();
+
+
+        const attendance = {
+
+            id: Date.now(),
+
+            nama: name,
+
+            status: "Hadir",
+
+            tanggalKey: today,
+
+            tanggal: getTanggalWIB(),
+
+            jam:
+                `${waktu.hour}:${waktu.minute}:${waktu.second}`,
+
+            waktu:
+                getTimeNow()
+
+        };
+
+
+        /* SIMPAN DATA */
+
+        data.push(attendance);
+
+        saveData(data);
+
+        renderTable();
+
+
+        /* DISABLE BUTTON */
+
+        submitBtn.disabled = true;
+
+        submitBtn.textContent =
+            "⏳ Mengirim absensi...";
+
+
+        /* =================================================
+           KIRIM EMAIL
+        ================================================= */
+
+        try {
+
+            await emailjs.send(
+
+                EMAILJS_SERVICE_ID,
+
+                EMAILJS_TEMPLATE_ID,
+
+                {
+
+                    nama: name,
+
+                    status: "Hadir",
+
+                    tanggal:
+                        getTanggalWIB(),
+
+                    jam:
+                        `${waktu.hour}:${waktu.minute}:${waktu.second}`,
+
+                    waktu:
+                        getTimeNow()
+
+                }
+
+            );
+
+
+            showNotification(
+                `✅ ${name} berhasil absen dan email berhasil dikirim!`
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "EmailJS Error:",
+                error
+            );
+
+            showNotification(
+                "⚠️ Absensi tersimpan, tetapi email gagal dikirim.",
+                true
+            );
+
+        }
+
+
+        /* RESET */
+
+        nameInput.value = "";
+
+        hadir.checked = false;
+
+        submitBtn.disabled = false;
+
+        submitBtn.textContent =
+            "📤 Kirim Kehadiran";
+
+    }
+);
+
+
+/* =====================================================
+   TABEL ABSENSI
+===================================================== */
+
+function renderTable() {
+
+    const wrapper =
+        document.getElementById(
+            "tableWrapper"
+        );
+
+    const data =
+        getData();
+
+    const today =
+        getDateKey();
+
+
+    const todayData =
+        data.filter(item =>
+            item.tanggalKey === today
+        );
+
+
+    document.getElementById(
+        "totalHadir"
+    ).textContent =
+        todayData.length;
+
+
+    document.getElementById(
+        "totalHari"
+    ).textContent =
+        todayData.length;
+
+
+    if (todayData.length === 0) {
+
+        wrapper.innerHTML = `
+
+            <div class="empty">
+
+                <div style="
+                    font-size:40px;
+                    margin-bottom:10px;
+                ">
+                    🕐
+                </div>
+
+                Belum ada siswa yang
+                melakukan absensi hari ini.
+
+                <br><br>
+
+                Jadilah yang pertama!
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    todayData.sort(
+        (a,b) => a.id - b.id
+    );
+
+
+    let rows = "";
+
+
+    todayData.forEach(
+        (item,index) => {
+
+            rows += `
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${index + 1}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHTML(item.nama)}
+                    </td>
+
+                    <td>
+
+                        <span class="badge">
+                            ✓ Hadir
+                        </span>
+
+                    </td>
+
+                    <td>
+                        ${escapeHTML(item.tanggal)}
+                    </td>
+
+                    <td>
+                        🕐 ${escapeHTML(item.waktu)}
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    wrapper.innerHTML = `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>No</th>
+
+                    <th>Nama Siswa</th>
+
+                    <th>Status</th>
+
+                    <th>Tanggal</th>
+
+                    <th>Waktu Kirim</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${rows}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SECURITY
+===================================================== */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+/* =====================================================
+   HAPUS SEMUA
+===================================================== */
+
+document
+.getElementById("deleteAll")
+.addEventListener(
+    "click",
+    function() {
+
+        const yakin =
+            confirm(
+                "Yakin ingin menghapus semua data absensi?"
+            );
+
+        if (!yakin) return;
+
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+        renderTable();
+
+        showNotification(
+            "🗑️ Semua data telah dihapus!"
+        );
+
+    }
+);
+
+
+/* =====================================================
+   PERGANTIAN HARI
+===================================================== */
+
+let lastDate =
+    getDateKey();
+
+
+setInterval(
+    () => {
+
+        const currentDate =
+            getDateKey();
+
+
+        if (
+            currentDate !==
+            lastDate
+        ) {
+
+            lastDate =
+                currentDate;
+
+            renderTable();
+
+            showNotification(
+                "🌅 Hari baru! Absensi telah diperbarui."
+            );
+
+        }
+
+    },
+    1000
+);
+
+
+/* =====================================================
+   MULAI
+===================================================== */
+
+renderTable();
+
+</script>
+
+</body>
+</html>
